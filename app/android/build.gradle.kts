@@ -4,6 +4,8 @@ SPDX-License-Identifier: MIT
 */
 
 import com.android.build.gradle.BaseExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 allprojects {
     repositories {
@@ -25,6 +27,21 @@ subprojects {
 
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+subprojects {
+    plugins.withId("com.android.library") {
+        extensions.configure(BaseExtension::class.java) {
+            defaultConfig.ndk.abiFilters.clear()
+            defaultConfig.ndk.abiFilters.add("arm64-v8a")
+        }
+    }
+
+    if (project.name == "tflite_flutter") {
+        tasks.withType<KotlinCompile>().configureEach {
+            compilerOptions.jvmTarget.set(JvmTarget.JVM_11)
+        }
+    }
 }
 
 tasks.register<Delete>("clean") {

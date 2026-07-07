@@ -1,3 +1,15 @@
 .DS_Store
 .idea/
 .workbuddy/
+
+# Secrets / local keys
+docs/*_private.pem
+
+# Flutter app build outputs (see also app/.gitignore)
+app/build/
+app/.dart_tool/
+app/.flutter-plugins-dependencies
+app/android/.gradle/
+app/android/build/
+app/build_log.txt
+app/.vscode/

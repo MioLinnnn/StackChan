@@ -209,8 +209,15 @@ class ValueConstant {
   /// 1. Generate RSA key pair on your server (2048-bit recommended)
   /// 2. Extract the public key in PEM format
   /// 3. Replace the content below with your server's public key
-  static const String serverPublicKey = '''
-''';
+  static const String serverPublicKey = '''-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApiXcbaLdBACI3yOGLDuD
+VBFPHC3NwZm/xVTVPUjwaxFoLxhMAXplehqUJd+Qd+K/g01B8h4pplkhpJZktLBe
+LC9nW5E97Jjw6sVqqneDuaGbwMyfio/qclsmkLUhY+zJdDEVm2OGowLE8QnggPPb
+Eq+MKSOnqZWRs/NLwRJsVj432KTehEXlx8BzV43WGfz6bb0SlEct7cCpXXzXcT7P
+oBAbGcJizzO8zkYxEWhvPnoBVuDubCl4sMkF6wwYWaBuxqT2b0H3vBE3pXGeovdx
+9hAo2yQQYtqeL+IRomv5bhFkoWKAX2S7g2oo5lbqfbqZnNTucNB9jpRv8Ods0Tq5
+dQIDAQAB
+-----END PUBLIC KEY-----''';
 
   /// Client RSA Private Key for decrypting incoming responses
   ///
@@ -222,8 +229,33 @@ class ValueConstant {
   /// Key Usage:
   /// - Decrypt data encrypted with the corresponding public key
   /// - Used for secure server-to-client communication
-  static const String clientPrivateKey = '''
-''';
+  static const String clientPrivateKey = '''-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAq39sK0dQPzfrWthyi3XyGQVOQDpmxfeqArafDe0lGutY8mfl
+uE1kuHdZwuNhIeXip+Hmacyw1md36zR93V2DkSrdDYrm+SI5pg4QCob0vLpqzERT
+SrKHPJHRuD0PVePx6TZpgEg4orwsuTBPvJzbh18qMOYGCAk0MZY2XveLc/nPDT1l
+YeGjcdj7cCHuUjvFlPLYMxRjmrAom2jt9ZpKP01qHiGg5N2NAy1FTqEmTN+roN8/
+mv+BFNySDJhxYoTxStqB3ZTaTdx+Gxa3qX/SDq8NlXGGbCQNBmU2PU8Q/aNdjB//
+n1IcRBcigLA7BQWwy6O7w0p+kRXhN3eZpcvOywIDAQABAoIBAArtg6b+VE6y8XxI
+boQUb+jIPcQ59HKI5XxmxpvMkKC2fmRz2l90DwbyE/YnJvlR/K9V5ai4Mkx3K10B
+a0O/wbJuWMeUIkOduq6qFruU/eNIvaVmdSg9WAC0CfkDawa+D5wcq3xRHcrA0ti6
+C1qpZBOsLLQQ9DFu5LSELdK/U1OAbMK86lbxY2sJg6A6z1QAnvB5TVszxbD8tQXl
+dY4xsUHVWAPqSp86M4VKQVRs+B5EoKuvZ8c5Bv92luQ3NXN+8RfLdVVctw/qUcVB
+TC7F+EKIO9rHpPM/PHx4IRPyl+5klKYsSsWHAoBEQxhM9weyrzd/r983wlbtIUv7
+u1gz14ECgYEAxkj7zN2fNEY9G2QuAGbedbaILls5LujeURwyrjux0f1z7kN0TSVQ
+U+ncWtmmeiAgbCwuRJdBDnBVKiT5lj97IZloPQohClO5PAcWa6UQVMmmVbvUU6Zc
+5v+9Im6VZwgyVzPFCJ6cZuweAsDEV21uH+a/A/jj6P96uVwwXvVnzr8CgYEA3Wpo
+Bx2Ia3dSZNgQZqLJBj0NncwEWLGsM4lbzL5eNFzoktOrdINsr8/jou+wVyIoQ1wq
+ZIoR7bVZ5cVoUSmiip8FkkMklVVFe/lUj7DukVie4tKInf9kGYnOewlZyz838wzF
+0Z6ELI93clno/M7nkjtGWbJkhu/MrLFIveF7jvUCgYEAwie8x4FK3rjYJPYXRTV1
+JvYwqpOQjqpe5jUiOxEgsWnoFqneO5wJ5+Dab+sm4/aJSOKJ+4fPn//GpJnH+qL2
+QpQgSYSdjaslee3GumjKcPty8AgXhEEmPtqzq/90M4sHH/QFPsdwhic1y6RNnP3+
+Eyaya4VORVvEI7RteM37c6kCgYBNYlgTTI4WSTDB0AYDaRdrF8F/igNm4En4BSTR
+bSNNl78tOc9tvFUrKTQ9CRqPiX+a80ZZtyvG8aAGvzTTUQLfAe8XjGHn01KinqSg
+R81JfTiiu8RFvDHG/zPsKnt4npK2XptwxL8bN9UeYTAd0055/D99L+0UgBD/tkJf
+IsRlVQKBgHdLPBsW9CZJoSSs93yZRVwNJ4YHp1ePEyF7LM2ANWhriRh4iYtR5wAW
+xgfngNgdd3wsPw95n1V/In5ZgQ0PX0z/XcjjB3K/1Tu+pALe9Gov470qUIqwreyJ
++/4LV9yUORmvmfUQPD0N1nLeckzbeui5Pe9vB2miXQi6uR6P0XVu
+-----END RSA PRIVATE KEY-----''';
 
   // ===========================================================================
   // Character Sets
@@ -308,6 +340,31 @@ class ValueConstant {
   ///
   /// Note: Each StackChan device should have a unique key pair in production.
   /// This is a default development key for testing purposes.
-  static const stackChanBluePrivateKey = '''
-''';
+  static const stackChanBluePrivateKey = '''-----BEGIN RSA PRIVATE KEY-----
+MIIEowIBAAKCAQEAq39sK0dQPzfrWthyi3XyGQVOQDpmxfeqArafDe0lGutY8mfl
+uE1kuHdZwuNhIeXip+Hmacyw1md36zR93V2DkSrdDYrm+SI5pg4QCob0vLpqzERT
+SrKHPJHRuD0PVePx6TZpgEg4orwsuTBPvJzbh18qMOYGCAk0MZY2XveLc/nPDT1l
+YeGjcdj7cCHuUjvFlPLYMxRjmrAom2jt9ZpKP01qHiGg5N2NAy1FTqEmTN+roN8/
+mv+BFNySDJhxYoTxStqB3ZTaTdx+Gxa3qX/SDq8NlXGGbCQNBmU2PU8Q/aNdjB//
+n1IcRBcigLA7BQWwy6O7w0p+kRXhN3eZpcvOywIDAQABAoIBAArtg6b+VE6y8XxI
+boQUb+jIPcQ59HKI5XxmxpvMkKC2fmRz2l90DwbyE/YnJvlR/K9V5ai4Mkx3K10B
+a0O/wbJuWMeUIkOduq6qFruU/eNIvaVmdSg9WAC0CfkDawa+D5wcq3xRHcrA0ti6
+C1qpZBOsLLQQ9DFu5LSELdK/U1OAbMK86lbxY2sJg6A6z1QAnvB5TVszxbD8tQXl
+dY4xsUHVWAPqSp86M4VKQVRs+B5EoKuvZ8c5Bv92luQ3NXN+8RfLdVVctw/qUcVB
+TC7F+EKIO9rHpPM/PHx4IRPyl+5klKYsSsWHAoBEQxhM9weyrzd/r983wlbtIUv7
+u1gz14ECgYEAxkj7zN2fNEY9G2QuAGbedbaILls5LujeURwyrjux0f1z7kN0TSVQ
+U+ncWtmmeiAgbCwuRJdBDnBVKiT5lj97IZloPQohClO5PAcWa6UQVMmmVbvUU6Zc
+5v+9Im6VZwgyVzPFCJ6cZuweAsDEV21uH+a/A/jj6P96uVwwXvVnzr8CgYEA3Wpo
+Bx2Ia3dSZNgQZqLJBj0NncwEWLGsM4lbzL5eNFzoktOrdINsr8/jou+wVyIoQ1wq
+ZIoR7bVZ5cVoUSmiip8FkkMklVVFe/lUj7DukVie4tKInf9kGYnOewlZyz838wzF
+0Z6ELI93clno/M7nkjtGWbJkhu/MrLFIveF7jvUCgYEAwie8x4FK3rjYJPYXRTV1
+JvYwqpOQjqpe5jUiOxEgsWnoFqneO5wJ5+Dab+sm4/aJSOKJ+4fPn//GpJnH+qL2
+QpQgSYSdjaslee3GumjKcPty8AgXhEEmPtqzq/90M4sHH/QFPsdwhic1y6RNnP3+
+Eyaya4VORVvEI7RteM37c6kCgYBNYlgTTI4WSTDB0AYDaRdrF8F/igNm4En4BSTR
+bSNNl78tOc9tvFUrKTQ9CRqPiX+a80ZZtyvG8aAGvzTTUQLfAe8XjGHn01KinqSg
+R81JfTiiu8RFvDHG/zPsKnt4npK2XptwxL8bN9UeYTAd0055/D99L+0UgBD/tkJf
+IsRlVQKBgHdLPBsW9CZJoSSs93yZRVwNJ4YHp1ePEyF7LM2ANWhriRh4iYtR5wAW
+xgfngNgdd3wsPw95n1V/In5ZgQ0PX0z/XcjjB3K/1Tu+pALe9Gov470qUIqwreyJ
++/4LV9yUORmvmfUQPD0N1nLeckzbeui5Pe9vB2miXQi6uR6P0XVu
+-----END RSA PRIVATE KEY-----''';
 }

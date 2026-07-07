@@ -270,13 +270,11 @@ class _StackChanRotaryRobotJsState extends State<StackChanRotaryRobotJs> {
     final byteData = await image.toByteData(format: ui.ImageByteFormat.rawRgba);
 
     if (byteData != null) {
-      //convertas three_js Uint8Array
       final uint8List = byteData.buffer.asUint8List();
-      final nativeArray = three.Uint8Array.fromList(uint8List);
 
       //updatetexture
       expressionTexture.image = three.ImageElement(
-        data: nativeArray,
+        data: uint8List,
         width: canvasWidth.toInt(),
         height: canvasHeight.toInt(),
       );

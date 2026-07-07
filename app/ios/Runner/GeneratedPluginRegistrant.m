@@ -1,8 +1,3 @@
-/*
-SPDX-FileCopyrightText: 2026 M5Stack Technology CO LTD
-SPDX-License-Identifier: MIT
-*/
-
 //
 //  Generated file. Do not edit.
 //
@@ -119,8 +114,8 @@ SPDX-License-Identifier: MIT
 @import three_js_sensors;
 #endif
 
-#if __has_include(<video_player_avfoundation/FVPVideoPlayerPlugin.h>)
-#import <video_player_avfoundation/FVPVideoPlayerPlugin.h>
+#if __has_include(<video_player_avfoundation/VideoPlayerPlugin.h>)
+#import <video_player_avfoundation/VideoPlayerPlugin.h>
 #else
 @import video_player_avfoundation;
 #endif
@@ -152,7 +147,7 @@ SPDX-License-Identifier: MIT
   [PermissionHandlerPlugin registerWithRegistrar:[registry registrarForPlugin:@"PermissionHandlerPlugin"]];
   [SharedPreferencesPlugin registerWithRegistrar:[registry registrarForPlugin:@"SharedPreferencesPlugin"]];
   [TJSSensorsPlugin registerWithRegistrar:[registry registrarForPlugin:@"TJSSensorsPlugin"]];
-  [FVPVideoPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"FVPVideoPlayerPlugin"]];
+  [VideoPlayerPlugin registerWithRegistrar:[registry registrarForPlugin:@"VideoPlayerPlugin"]];
   [WebViewFlutterPlugin registerWithRegistrar:[registry registrarForPlugin:@"WebViewFlutterPlugin"]];
 }
 
