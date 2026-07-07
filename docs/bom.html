@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackChan 物料清单与购买指南</title>
+    <style>
+        :root {
+            --primary: #e85d3a;
+            --secondary: #f7a072;
+            --bg: #f9f7f5;
+            --card-bg: #ffffff;
+            --text: #2c2826;
+            --text-light: #6b6560;
+            --border: #e8e3df;
+            --accent-blue: #4a8fe0;
+            --accent-green: #4caf7d;
+            --accent-purple: #9b72cf;
+            --accent-amber: #e8a838;
+            --accent-red: #e53935;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .hero {
+            background: linear-gradient(135deg, #2c2826 0%, #e85d3a 60%, #f7a072 100%);
+            color: #fff;
+            padding: 70px 40px 50px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: var(--bg);
+            border-radius: 50% 50% 0 0;
+        }
+        .hero h1 { font-size: 2.6em; font-weight: 800; }
+        .hero .subtitle { font-size: 1.15em; margin-top: 10px; opacity: 0.9; }
+        .hero .price-summary { margin-top: 16px; font-size: 1.1em; opacity: 0.85; }
+
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 20px; }
+
+        .section { margin: 40px 0; }
+        .section-title {
+            font-size: 1.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+
+        /* Pricing table */
+        .pricing-table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        .pricing-table th, .pricing-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.92em; }
+        .pricing-table th { background: var(--bg); font-weight: 600; color: var(--text-light); font-size: 0.82em; text-transform: uppercase; letter-spacing: 0.05em; }
+        .pricing-table tr:hover { background: #fefaf8; }
+        .pricing-table .total-row { font-weight: 700; background: #fff5f0 !important; }
+        .pricing-table .total-row td { border-top: 2px solid var(--primary); }
+        .price-usd { color: var(--accent-green); font-weight: 600; }
+        .price-cny { color: var(--accent-red); font-weight: 600; }
+        .badge-optional { display: inline-block; font-size: 0.7em; padding: 1px 8px; border-radius: 10px; background: var(--bg); color: var(--text-light); border: 1px solid var(--border); }
+        .badge-required { display: inline-block; font-size: 0.7em; padding: 1px 8px; border-radius: 10px; background: #fff0e8; color: var(--primary); border: 1px solid var(--secondary); }
+
+        /* Scheme toggle */
+        .scheme-selector { display: flex; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+        .scheme-btn {
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            background: var(--card-bg);
+            cursor: pointer;
+            font-size: 0.92em;
+            font-weight: 600;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .scheme-btn:hover { border-color: var(--secondary); }
+        .scheme-btn.active { border-color: var(--primary); background: #fff5f0; color: var(--primary); }
+        .scheme-btn .scheme-price { font-size: 0.82em; font-weight: 400; color: var(--text-light); margin-top: 2px; }
+
+        /* Checklist */
+        .checklist { list-style: none; padding: 0; }
+        .checklist li {
+            padding: 8px 0 8px 28px;
+            position: relative;
+            font-size: 0.92em;
+        }
+        .checklist li::before {
+            content: '✅';
+            position: absolute;
+            left: 0;
+        }
+        .checklist li.optional::before { content: '⬜'; }
+
+        /* Tool list */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+        }
+        @media (max-width: 600px) { .tool-grid { grid-template-columns: 1fr; } }
+        .tool-item {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 14px 18px;
+            border-left: 4px solid var(--accent-amber);
+        }
+        .tool-item h4 { font-size: 0.92em; margin-bottom: 2px; }
+        .tool-item p { font-size: 0.82em; color: var(--text-light); }
+
+        /* Steps */
+        .step-list { list-style: none; counter-reset: step; }
+        .step-list li {
+            counter-increment: step;
+            padding: 10px 0 10px 48px;
+            position: relative;
+            font-size: 0.92em;
+        }
+        .step-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: 0;
+            top: 10px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85em;
+            font-weight: 700;
+        }
+
+        /* Note */
+        .note {
+            background: #fff8e1;
+            border-left: 4px solid var(--accent-amber);
+            border-radius: 8px;
+            padding: 14px 18px;
+            font-size: 0.88em;
+            margin: 12px 0;
+        }
+        .note.warning { background: #ffebee; border-left-color: var(--accent-red); }
+        .note.info { background: #e3f2fd; border-left-color: var(--accent-blue); }
+
+        .footer { text-align: center; padding: 36px; color: var(--text-light); font-size: 0.85em; }
+
+        /* Comparison */
+        .compare-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 700px) { .compare-grid { grid-template-columns: 1fr; } }
+        .compare-item {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid var(--border);
+            text-align: center;
+        }
+        .compare-item.recommended { border-color: var(--primary); background: #fff5f0; }
+        .compare-item h4 { font-size: 1em; margin-bottom: 6px; }
+        .compare-item .price { font-size: 1.4em; font-weight: 800; margin: 8px 0; }
+        .compare-item .price .currency { font-size: 0.55em; font-weight: 400; color: var(--text-light); }
+        .compare-item ul { list-style: none; text-align: left; padding: 8px 0 0; }
+        .compare-item ul li { padding: 3px 0; font-size: 0.85em; color: var(--text-light); }
+        .compare-item ul li::before { content: '✓ '; color: var(--accent-green); font-weight: 700; }
+        .compare-item .rec-badge {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            font-size: 0.7em;
+            font-weight: 700;
+            padding: 2px 12px;
+            border-radius: 20px;
+            margin-bottom: 8px;
+        }
+
+        .sku-code {
+            font-family: 'SF Mono', 'Fira Code', monospace;
+            font-size: 0.82em;
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<section class="hero">
+    <h1>🛒 StackChan 完整物料清单</h1>
+    <div class="subtitle">统一购买 · 一次到位 · 从零复刻</div>
+    <div class="price-summary">参考总预算：≈ <strong>¥1,680 ~ ¥2,460</strong>（含开发工具）</div>
+</section>
+
+<div class="container">
+
+    <!-- ===== 方案对比 ===== -->
+    <div class="section">
+        <h2 class="section-title">购买方案对比</h2>
+
+        <div class="compare-grid">
+            <div class="compare-item">
+                <h4>方案 A：基础版</h4>
+                <div class="price">$99 <span class="currency">USD</span></div>
+                <div style="font-size:0.85em; color:var(--text-light);">≈ ¥720</div>
+                <ul>
+                    <li>StackChan 机器人 × 1 (K151)</li>
+                    <li>CoreS3 主机（已预装）</li>
+                    <li>USB-C 数据线 + 说明书</li>
+                    <li>❌ 无遥控器</li>
+                    <li>❌ 无开发套件</li>
+                </ul>
+            </div>
+
+            <div class="compare-item recommended">
+                <div class="rec-badge">⭐ 推荐</div>
+                <h4>方案 B：完整套装</h4>
+                <div class="price">$125 <span class="currency">USD</span></div>
+                <div style="font-size:0.85em; color:var(--text-light);">≈ ¥910</div>
+                <ul>
+                    <li>StackChan 机器人 × 1 (K151)</li>
+                    <li>遥控器 × 1 (StickC-Plus + JoyC)</li>
+                    <li>CoreS3 主机（已预装）</li>
+                    <li>USB-C 数据线 × 2</li>
+                    <li>内六角扳手 × 2</li>
+                    <li>表情贴纸 + 说明书</li>
+                </ul>
+            </div>
+
+            <div class="compare-item">
+                <h4>方案 C：自组装版</h4>
+                <div class="price">$100 <span class="currency">USD</span></div>
+                <div style="font-size:0.85em; color:var(--text-light);">≈ ¥730</div>
+                <ul>
+                    <li>StackChan Body 单独 × 1 ($55)</li>
+                    <li>StackChan Core 单独 × 1 ($45)</li>
+                    <li>需自行组装</li>
+                    <li>❌ 无遥控器</li>
+                    <li>❌ 无配件</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="note info">
+            <strong>💡 推荐方案 B (K151-R)</strong>：一步到位，既包含机器人也包含遥控器，价格最优（比分开买便宜约 $20），而且自带内六角扳手等组装工具。
+        </div>
+    </div>
+
+    <!-- ===== 详细物料清单 ===== -->
+    <div class="section">
+        <h2 class="section-title">📋 详细物料清单</h2>
+
+        <div class="card">
+            <h3 style="margin-bottom:12px;">一、必购硬件</h3>
+
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th style="width:32px"></th>
+                        <th>物料名称</th>
+                        <th>SKU / 型号</th>
+                        <th>数量</th>
+                        <th>参考价格</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-required">必</span></td>
+                        <td><strong>StackChan 机器人本体</strong><br><span style="font-size:0.82em;color:var(--text-light);">已预装 CoreS3 主机</span></td>
+                        <td><span class="sku-code">K151</span></td>
+                        <td>1</td>
+                        <td><span class="price-usd">$99</span> / <span class="price-cny">¥699</span></td>
+                        <td>淘宝/官方店</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-optional">选</span></td>
+                        <td><strong>遥控器套件</strong><br><span style="font-size:0.82em;color:var(--text-light);">StickC-Plus + Hat Mini JoyC</span></td>
+                        <td><span class="sku-code">K151-R</span></td>
+                        <td>0~1</td>
+                        <td><span class="price-usd">+$26</span></td>
+                        <td>含在 K151-R 套装中</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-optional">选</span></td>
+                        <td><strong>维修备件包</strong><br><span style="font-size:0.82em;color:var(--text-light);">备用螺丝、小零件</span></td>
+                        <td><span class="sku-code">-</span></td>
+                        <td>1</td>
+                        <td><span class="price-usd">$2.50</span></td>
+                        <td>官方配件</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p style="font-size:0.85em;color:var(--text-light);margin-top:8px;">
+                💡 如果直接购买 <strong>K151-R 套装 ($125 / ≈¥910)</strong>，则同时获得机器人 + 遥控器。
+                如果单独购买 K151 再另配遥控器，成本会更高 —— 建议直接上 K151-R。
+            </p>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom:12px;">二、开发工具（烧录与编译）</h3>
+
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th style="width:32px"></th>
+                        <th>物料</th>
+                        <th>推荐型号</th>
+                        <th>数量</th>
+                        <th>参考价格</th>
+                        <th>用途</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-required">必</span></td>
+                        <td><strong>USB-C 数据线</strong></td>
+                        <td>USB-A to USB-C</td>
+                        <td>1~2</td>
+                        <td>≈ ¥15~30</td>
+                        <td>烧录固件 / 供电</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-required">必</span></td>
+                        <td><strong>USB 串口适配器</strong></td>
+                        <td>CH340 / CP2102</td>
+                        <td>1</td>
+                        <td>≈ ¥15~25</td>
+                        <td>串口调试（备用）</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-optional">选</span></td>
+                        <td><strong>MicroSD 卡</strong></td>
+                        <td>Class 10, ≤32GB</td>
+                        <td>1</td>
+                        <td>≈ ¥25~40</td>
+                        <td>固件素材存储</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-optional">选</span></td>
+                        <td><strong>USB 集线器</strong></td>
+                        <td>USB 3.0 HUB</td>
+                        <td>1</td>
+                        <td>≈ ¥30~60</td>
+                        <td>多设备同时调试</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom:12px;">三、服务器部署（可选）</h3>
+
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th style="width:32px"></th>
+                        <th>物料</th>
+                        <th>推荐配置</th>
+                        <th>参考价格（月）</th>
+                        <th>备注</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-optional">选</span></td>
+                        <td><strong>云服务器 (VPS)</strong></td>
+                        <td>2核 4G, 5Mbps</td>
+                        <td>≈ ¥50~100/月</td>
+                        <td>部署 server/ 模块</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-optional">选</span></td>
+                        <td><strong>MySQL 数据库</strong></td>
+                        <td>1核 2G, 20G 存储</td>
+                        <td>≈ ¥30~60/月</td>
+                        <td>随云服务器或单独购买</td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:center;"><span class="badge-optional">选</span></td>
+                        <td><strong>域名（可选）</strong></td>
+                        <td>.com / .cn 域名</td>
+                        <td>≈ ¥30~60/年</td>
+                        <td>用于 WebSocket 和 API</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="note">
+                <strong>注意</strong>：出厂固件默认连接的是 M5Stack 官方的服务器（47.113.125.164:12800）和小智 AI 平台（xiaozhi.me）。
+                如果你想使用官方云端服务，<strong>可以不部署自己的服务器</strong>。自建服务器仅在你需要私有化部署或修改后端逻辑时才有必要。
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 推荐配置 ===== -->
+    <div class="section">
+        <h2 class="section-title">🏆 推荐配置方案</h2>
+
+        <div class="card">
+            <h3 style="color:var(--primary);">方案：完整复刻（推荐）</h3>
+            <div class="compare-grid" style="margin-top:14px;">
+                <div class="compare-item recommended" style="grid-column: span 2;">
+                    <div class="rec-badge">👍 最适合</div>
+                    <ul>
+                        <li><strong>K151-R 套装</strong> — 官方店 / 淘宝，≈ ¥910</li>
+                        <li>维修备件包 × 1 — $2.50 / ≈ ¥18</li>
+                        <li>USB-C 数据线 × 2 — ≈ ¥30</li>
+                        <li>MicroSD 卡 32GB × 1 — ≈ ¥30</li>
+                    </ul>
+                    <div style="margin-top:12px; font-weight:700; font-size:1.1em;">
+                        硬件总投入 ≈ <span style="color:var(--primary);">¥988</span>
+                    </div>
+                    <div style="font-size:0.82em; color:var(--text-light); margin-top:4px;">
+                        如果要自建服务器，再加云服务器 ≈ ¥80~160/月
+                    </div>
+                </div>
+            </div>
+
+            <h4 style="margin-top:20px;">购买渠道对比</h4>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>渠道</th>
+                        <th>价格</th>
+                        <th>物流</th>
+                        <th>适合</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>🌐 <strong>M5Stack 官方商店</strong><br><span style="font-size:0.82em;">shop.m5stack.com</span></td>
+                        <td>$99 / $125</td>
+                        <td>国际物流，约 7~15 天</td>
+                        <td>海外购买</td>
+                    </tr>
+                    <tr>
+                        <td>🇨🇳 <strong>淘宝 / 天猫</strong><br><span style="font-size:0.82em;">M5Stack 官方旗舰店</span></td>
+                        <td>K151: ≈ ¥699</td>
+                        <td>国内 2~5 天</td>
+                        <td><strong>国内首选</strong>，含税含运</td>
+                    </tr>
+                    <tr>
+                        <td>🇯🇵 <strong>DigiKey / Mouser</strong></td>
+                        <td>参考官方价</td>
+                        <td>全球配送</td>
+                        <td>企业采购</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== 软件环境搭建 ===== -->
+    <div class="section">
+        <h2 class="section-title">🛠️ 开发环境必备</h2>
+
+        <div class="card">
+            <div class="tool-grid">
+                <div class="tool-item" style="border-left-color:var(--primary);">
+                    <h4>ESP-IDF v5.5.4</h4>
+                    <p>编译 <strong>firmware/</strong>（机器人固件）所需。参考 ESP-IDF 官方文档安装。</p>
+                </div>
+                <div class="tool-item" style="border-left-color:var(--accent-purple);">
+                    <h4>ESP-IDF v5.4.2</h4>
+                    <p>编译 <strong>remote/</strong>（遥控器固件）所需。注意版本与固件不同。</p>
+                </div>
+                <div class="tool-item" style="border-left-color:var(--accent-blue);">
+                    <h4>Flutter SDK ^3.11.5</h4>
+                    <p>编译 <strong>app/</strong>（移动端 App）所需。需配置 Android / iOS 开发环境。</p>
+                </div>
+                <div class="tool-item" style="border-left-color:var(--accent-green);">
+                    <h4>Go 1.26 + GoFrame v2</h4>
+                    <p>编译 <strong>server/</strong>（后端）所需。配合 MySQL 数据库使用。</p>
+                </div>
+                <div class="tool-item">
+                    <h4>M5Burner 烧录工具</h4>
+                    <p>官方统一烧录工具，用于恢复出厂固件或刷写自定义固件。</p>
+                </div>
+                <div class="tool-item">
+                    <h4>Python 3 + fetch_repos</h4>
+                    <p>固件编译前需运行 <code>python fetch_repos.py</code> 拉取 mooncake 等外部依赖。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== 购买步骤 ===== -->
+    <div class="section">
+        <h2 class="section-title">📦 统一购买步骤</h2>
+
+        <div class="card">
+            <ol class="step-list">
+                <li><strong>打开淘宝</strong>，搜索 <strong>"M5Stack StackChan"</strong> 或直接访问 M5Stack 官方旗舰店。</li>
+                <li><strong>选择 K151-R 套装</strong>（带遥控器版本），确认 SKU 为 <span class="sku-code">K151-R</span>，价格约 <strong>¥910</strong>。</li>
+                <li><strong>加入购物车</strong>，数量 × 1（如需多台可重复该步骤）。</li>
+                <li><strong>顺带购买配件</strong>：
+                    <ul style="margin:6px 0 0 20px; font-size:0.9em;">
+                        <li>MicroSD 卡 32GB（Class 10） — ¥25~40</li>
+                        <li>USB-C 数据线 × 2（备用） — ¥15~30</li>
+                        <li>建议顺带一个 <strong>USB 串口模块</strong>（CH340） — ¥15~25</li>
+                    </ul>
+                </li>
+                <li><strong>结算下单</strong>。如果不放心，可以联系客服确认 <strong>K151-R</strong> 是否为最新版固件。</li>
+                <li><strong>收货后检查</strong>：包装内容是否齐全（机器人本体、遥控器、数据线、内六角扳手、贴纸、说明书）。</li>
+            </ol>
+        </div>
+
+        <div class="note warning">
+            <strong>⚠️ 重要提醒</strong>：
+            <ul style="margin:6px 0 0 18px;">
+                <li>StackChan 只支持 <strong>2.4GHz Wi-Fi</strong>，不支持 5GHz —— 确保你的路由器有 2.4G 频段。</li>
+                <li>收到后 <strong>不要强行手动旋转舵机</strong>（通电前不确定电机是否受控时），否则可能损坏硬件。</li>
+                <li>Y 轴（垂直）舵机角度建议控制在 <strong>5°~85°</strong>，极限角度易导致堵转损坏。</li>
+                <li>烧录固件建议使用 <strong>底座上的 USB-C 接口</strong>，避免电机转动造成干扰。</li>
+            </ul>
+        </div>
+
+        <div class="note info">
+            <strong>💡 快速启动建议</strong>：开箱后先 <strong>连接 USB-C 供电</strong> → 短按左侧电源键开机 → 使用出厂固件体验 AI 对话功能。
+            熟悉之后再用 M5Burner 或 ESP-IDF 刷写自己编译的固件。
+        </div>
+    </div>
+
+    <!-- ===== 完整预算表 ===== -->
+    <div class="section">
+        <h2 class="section-title">💰 完整预算汇总</h2>
+
+        <div class="card">
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>说明</th>
+                        <th>最低预算</th>
+                        <th>推荐预算</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>🤖 K151-R 套装</td>
+                        <td>机器人本体 + 遥控器</td>
+                        <td>¥910</td>
+                        <td>¥910</td>
+                    </tr>
+                    <tr>
+                        <td>🔧 维修备件</td>
+                        <td>备用螺丝等（$2.50）</td>
+                        <td>¥0</td>
+                        <td>¥18</td>
+                    </tr>
+                    <tr>
+                        <td>🔌 USB-C 线材</td>
+                        <td>备用数据线</td>
+                        <td>¥0</td>
+                        <td>¥30</td>
+                    </tr>
+                    <tr>
+                        <td>💾 MicroSD 卡</td>
+                        <td>32GB Class 10</td>
+                        <td>¥25</td>
+                        <td>¥30</td>
+                    </tr>
+                    <tr>
+                        <td>🔗 串口适配器</td>
+                        <td>CH340 模块</td>
+                        <td>¥0</td>
+                        <td>¥20</td>
+                    </tr>
+                    <tr>
+                        <td>🖥️ 云服务器（月费）</td>
+                        <td>可选，自建后端用</td>
+                        <td>¥0</td>
+                        <td>¥0~160/月</td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>硬件一次性投入</strong></td>
+                        <td></td>
+                        <td><strong>≈ ¥935</strong></td>
+                        <td><strong>≈ ¥1,008</strong></td>
+                    </tr>
+                    <tr class="total-row">
+                        <td><strong>含自建服务器（首月）</strong></td>
+                        <td>硬件 + 云服务</td>
+                        <td>≈ ¥985</td>
+                        <td>≈ ¥1,168</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ===== 快速检查 ===== -->
+    <div class="section">
+        <h2 class="section-title">✅ 收货检查清单</h2>
+
+        <div class="card">
+            <ul class="checklist">
+                <li>StackChan 机器人本体（含 CoreS3 主机）</li>
+                <li>遥控器（StickC-Plus + Hat Mini JoyC 组装完成）</li>
+                <li>USB-A to USB-C 数据线 × 2</li>
+                <li>1.25-4P 公对母同向延长线 100mm</li>
+                <li>内六角扳手 L 形 1.5mm（适配 M2 螺丝）</li>
+                <li>内六角扳手 L 形 2.5mm（适配 M3 螺丝）</li>
+                <li>角色表情贴纸</li>
+                <li>纸质说明书</li>
+                <li class="optional">收纳包或纸盒（因套装而异）</li>
+                <li class="optional">MicroSD 卡（需另购）</li>
+                <li class="optional">USB 串口模块 CH340（调试备用）</li>
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>StackChan Open-Source · 物料清单由 WorkBuddy 调研生成 · 2026-07-07</p>
+    <p style="margin-top:4px; opacity:0.7;">价格参考 M5Stack 官方商店及淘宝，实际以购买时为准</p>
+</div>
+
+</body>
+</html>

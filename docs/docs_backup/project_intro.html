@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StackChan 项目介绍</title>
+    <style>
+        :root {
+            --primary: #e85d3a;
+            --secondary: #f7a072;
+            --bg: #f9f7f5;
+            --card-bg: #ffffff;
+            --text: #2c2826;
+            --text-light: #6b6560;
+            --border: #e8e3df;
+            --accent-blue: #4a8fe0;
+            --accent-green: #4caf7d;
+            --accent-purple: #9b72cf;
+            --accent-amber: #e8a838;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        /* Hero */
+        .hero {
+            background: linear-gradient(135deg, #e85d3a 0%, #f7a072 50%, #fad4c0 100%);
+            color: #fff;
+            padding: 80px 40px 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: var(--bg);
+            border-radius: 50% 50% 0 0;
+        }
+        .hero h1 { font-size: 3em; font-weight: 800; letter-spacing: -0.02em; }
+        .hero .subtitle { font-size: 1.2em; margin-top: 12px; opacity: 0.9; }
+        .hero .tagline { margin-top: 8px; font-size: 0.95em; opacity: 0.75; }
+
+        /* Container */
+        .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+        /* Section */
+        .section { margin: 48px 0; }
+        .section-title {
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 24px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--primary);
+            display: inline-block;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border: 1px solid var(--border);
+        }
+        .card-title {
+            font-size: 1.15em;
+            font-weight: 700;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .card-title .badge {
+            display: inline-block;
+            font-size: 0.7em;
+            font-weight: 600;
+            padding: 2px 10px;
+            border-radius: 20px;
+            color: #fff;
+            margin-left: 6px;
+        }
+
+        /* Module Grid */
+        .module-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .module-grid { grid-template-columns: 1fr; }
+        }
+
+        .module-card {
+            background: var(--card-bg);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .module-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+        }
+        .module-header {
+            padding: 20px 24px 14px;
+            color: #fff;
+        }
+        .module-header h3 { font-size: 1.25em; }
+        .module-header .lang { font-size: 0.75em; opacity: 0.85; margin-top: 2px; }
+        .module-body { padding: 16px 24px 20px; font-size: 0.92em; color: var(--text-light); }
+
+        .mod-fw .module-header { background: linear-gradient(135deg, #e85d3a, #f7a072); }
+        .mod-app .module-header { background: linear-gradient(135deg, #4a8fe0, #7bb3f0); }
+        .mod-svr .module-header { background: linear-gradient(135deg, #4caf7d, #81c784); }
+        .mod-rmt .module-header { background: linear-gradient(135deg, #9b72cf, #c4a5f0); }
+
+        /* Tree */
+        .tree { font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace; font-size: 0.82em; line-height: 1.8; }
+        .tree .dir { color: var(--accent-amber); font-weight: 600; }
+        .tree .file { color: var(--text-light); }
+        .tree .cmt { color: #aaa; font-style: italic; }
+        .tree-toggle { cursor: pointer; user-select: none; }
+        .tree-toggle:hover { opacity: 0.7; }
+
+        /* Coupling Diagram (ASCII/SVG-like) */
+        .coupling-diagram {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 20px 0;
+            font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 0.85em;
+        }
+        .coupling-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .coupling-box {
+            padding: 8px 16px;
+            border-radius: 8px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85em;
+            text-align: center;
+            min-width: 100px;
+        }
+        .coupling-arrow {
+            color: var(--text-light);
+            font-size: 1.2em;
+        }
+        .coupling-protocol {
+            font-size: 0.7em;
+            color: var(--text-light);
+            text-align: center;
+            background: var(--bg);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* Tech Stack Tags */
+        .tech-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+        .tech-tag {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.78em;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            background: var(--bg);
+        }
+        .tech-tag.primary { border-color: var(--primary); color: var(--primary); }
+        .tech-tag.blue { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .tech-tag.green { border-color: var(--accent-green); color: var(--accent-green); }
+        .tech-tag.purple { border-color: var(--accent-purple); color: var(--accent-purple); }
+
+        /* Connector Lines */
+        .connector-line {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .connector-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+        .connector-label { font-size: 0.78em; color: var(--text-light); text-align: center; }
+
+        /* Implementation details */
+        .detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 768px) {
+            .detail-grid { grid-template-columns: 1fr; }
+        }
+        .detail-item {
+            background: var(--bg);
+            border-radius: 8px;
+            padding: 14px 18px;
+            border-left: 4px solid var(--primary);
+        }
+        .detail-item h4 { font-size: 0.92em; margin-bottom: 4px; }
+        .detail-item p { font-size: 0.82em; color: var(--text-light); }
+
+        /* Summary stats */
+        .stats {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .stat-item {
+            flex: 1;
+            min-width: 140px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .stat-number { font-size: 1.8em; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 0.82em; color: var(--text-light); margin-top: 4px; }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-light);
+            font-size: 0.85em;
+        }
+
+        /* List styles */
+        ul.feature-list { list-style: none; padding: 0; }
+        ul.feature-list li {
+            padding: 4px 0 4px 20px;
+            position: relative;
+            font-size: 0.9em;
+        }
+        ul.feature-list li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ========== HERO ========== -->
+<section class="hero">
+    <h1>🤖 StackChan</h1>
+    <div class="subtitle">M5Stack 与社区共创的超可爱 AI 桌面机器人</div>
+    <div class="tagline">开源项目 · 全栈架构 · 多模块协作</div>
+</section>
+
+<div class="container">
+
+    <!-- ========== OVERVIEW ========== -->
+    <div class="section">
+        <h2 class="section-title">项目概览</h2>
+        <div class="card">
+            <p>StackChan 是一款由 <strong>M5Stack</strong> 与用户社区联合打造的<strong>AI 桌面机器人</strong>。主控采用 <strong>ESP32-S3</strong>（240MHz 双核，16MB Flash + 8MB PSRAM），配备 2.0 寸触摸屏、摄像头、IMU 传感器、麦克风阵列、扬声器、RGB LED 及双伺服电机，支持 Wi-Fi / BLE / ESP-NOW 多种无线通信方式。</p>
+            <p style="margin-top:12px;">本仓库包含四大部分的开源资源：</p>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">app/</div>
+                    <div class="stat-label">Flutter 移动端 App</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">firmware/</div>
+                    <div class="stat-label">机器人固件 (ESP-IDF)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">server/</div>
+                    <div class="stat-label">Go 后端服务器</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">remote/</div>
+                    <div class="stat-label">ESP-NOW 遥控器固件</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== MODULE STRUCTURE ========== -->
+    <div class="section">
+        <h2 class="section-title">模块结构</h2>
+
+        <div class="module-grid">
+
+            <!-- Firmware -->
+            <div class="module-card mod-fw">
+                <div class="module-header">
+                    <h3>📟 firmware/ — 机器人固件</h3>
+                    <div class="lang">C/C++ · ESP-IDF v5.5.4 · v1.4.3</div>
+                </div>
+                <div class="module-body">
+                    <p>运行于 ESP32-S3 主控，基于 <strong>mooncake</strong> 应用框架 + <strong>xiaozhi-esp32</strong> 语音框架。通过 LVGL 渲染面部表情，驱动双伺服电机实现头部运动。</p>
+                    <div class="tech-tags">
+                        <span class="tech-tag primary">ESP-IDF</span>
+                        <span class="tech-tag">C++20</span>
+                        <span class="tech-tag">LVGL 9.4</span>
+                        <span class="tech-tag">WebSocket</span>
+                        <span class="tech-tag">BLE NimBLE</span>
+                        <span class="tech-tag">ESP-NOW</span>
+                    </div>
+                    <div class="tree" style="margin-top:12px;">
+                        <span class="dir">firmware/</span><br>
+                        ├── <span class="dir">main/</span><br>
+                        │&nbsp;&nbsp;├── <span class="file">main.cpp</span> <span class="cmt">// 入口：HAL 初始化 → 安装 App → 事件循环</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">hal/</span> <span class="cmt">// 硬件抽象层</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">hal.h/.cpp</span> <span class="cmt">// 核心 HAL（系统、显示、WiFi、BLE、IMU...）</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="dir">board/</span> <span class="cmt">// 板级定义（引脚、Bridge）</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;└── <span class="dir">drivers/</span> <span class="cmt">// BMI270、FTServo、PCF8563、PY32、Si12T</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">stackchan/</span> <span class="cmt">// 机器人核心实体</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">stackchan.h/.cpp</span> <span class="cmt">// Motion + Avatar + NeonLight + Modifier 池</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="dir">motion/</span> <span class="cmt">// 伺服电机控制 + 运动学 + 坐标映射</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="dir">avatar/</span> <span class="cmt">// 面部渲染引擎（皮肤、装饰器、表情）</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="dir">animation/</span> <span class="cmt">// 关键帧动画系统</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="dir">modifiers/</span> <span class="cmt">// 行为修饰器（眨眼、说话、呼吸、舞蹈等）</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;└── <span class="dir">addons/</span> <span class="cmt">// 配件（NeonLight RGB）</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">apps/</span> <span class="cmt">// mooncake App 层</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">app_launcher/</span> <span class="cmt">// 主启动器</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">app_ai_agent/</span> <span class="cmt">// 小智 AI 语音助手</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">app_avatar/</span> <span class="cmt">// Avatar 控制面板 + 视频通话</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">app_dance/</span> <span class="cmt">// 舞蹈模式</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">app_espnow_ctrl/</span> <span class="cmt">// ESP-NOW 遥控</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">app_app_center/</span> <span class="cmt">// 应用商店</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">app_ezdata/</span> <span class="cmt">// 数据同步</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">app_setup/</span> <span class="cmt">// 设置（15+ 配置 Worker）</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;└── <span class="file">common/</span> <span class="cmt">// 共享 UI 组件（状态栏、Toast、提醒）</span><br>
+                        │&nbsp;&nbsp;└── <span class="dir">assets/</span> <span class="cmt">// 图标、字体、音效</span><br>
+                        ├── <span class="file">sdkconfig.defaults</span> <span class="cmt">// ESP32-S3, 16MB Flash, OTA 双分区</span><br>
+                        ├── <span class="file">partitions.csv</span> <span class="cmt">// ota_0 + ota_1 + assets (SPIFFS)</span><br>
+                        └── <span class="file">repos.json</span> <span class="cmt">// 外部依赖（mooncake, xiaozhi-esp32 等）</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App -->
+            <div class="module-card mod-app">
+                <div class="module-header">
+                    <h3>📱 app/ — 移动端 App</h3>
+                    <div class="lang">Dart · Flutter 3.11 · v1.1.0</div>
+                </div>
+                <div class="module-body">
+                    <p>跨平台（iOS / Android）手机配套应用，通过 <strong>BLE</strong> 和 <strong>WebSocket</strong> 控制机器人。支持 3D 头像通话、摄像头查看、舞蹈编排、AI 智能体配置等功能。</p>
+                    <div class="tech-tags">
+                        <span class="tech-tag blue">Flutter</span>
+                        <span class="tech-tag blue">GetX</span>
+                        <span class="tech-tag">flutter_blue_plus</span>
+                        <span class="tech-tag">Dio</span>
+                        <span class="tech-tag">Opus Codec</span>
+                        <span class="tech-tag">Google ML Kit</span>
+                    </div>
+                    <div class="tree" style="margin-top:12px;">
+                        <span class="dir">app/</span><br>
+                        ├── <span class="dir">lib/</span> <span class="cmt">// Dart 源码核心</span><br>
+                        │&nbsp;&nbsp;├── <span class="file">main.dart</span> <span class="cmt">// 入口：初始化 AppState + 音频引擎</span><br>
+                        │&nbsp;&nbsp;├── <span class="file">app_state.dart</span> <span class="cmt">// 全局状态（GetX Controller）</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">model/</span> <span class="cmt">// 数据模型（设备、舞蹈、表情、小智 AI 模型等）</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">network/</span> <span class="cmt">// 网络层（Dio HTTP + WebSocket 二进制协议）</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">util/</span> <span class="cmt">// 工具（BLE 引擎、RSA 加密、Opus 音频、ML Kit 人脸检测）</span><br>
+                        │&nbsp;&nbsp;└── <span class="dir">view/</span> <span class="cmt">// UI 视图（Cupertino 风格）</span><br>
+                        │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">home.dart</span> <span class="cmt">// 底部 Tab 导航（StackChan + 设置）</span><br>
+                        │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">stack_chan.dart</span> <span class="cmt">// 功能入口卡片（Avatar/Camera/Motion/Dance）</span><br>
+                        │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">avatar.dart</span> <span class="cmt">// 3D 头像/通话界面</span><br>
+                        │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="file">dance.dart</span> <span class="cmt">// 舞蹈编辑器</span><br>
+                        │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├── <span class="dir">popup/</span> <span class="cmt">// 弹窗/底部 Sheet（登录、设备绑定、WiFi 配置、智能体配置）</span><br>
+                        │&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── <span class="dir">util/</span> <span class="cmt">// 3D 机器人、摇杆、AR 视图等组件</span><br>
+                        ├── <span class="dir">assets/</span> <span class="cmt">// SVG 图标、3D 模型 (.glb)、引导视频</span><br>
+                        ├── <span class="dir">android/</span> <span class="cmt">// Android 原生代码</span><br>
+                        ├── <span class="dir">ios/</span> <span class="cmt">// iOS 原生代码（含 SceneKit 3D 渲染）</span><br>
+                        └── <span class="file">pubspec.yaml</span> <span class="cmt">// 依赖声明</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Server -->
+            <div class="module-card mod-svr">
+                <div class="module-header">
+                    <h3>🖥️ server/ — 后端服务器</h3>
+                    <div class="lang">Go · GoFrame v2 · MySQL</div>
+                </div>
+                <div class="module-body">
+                    <p>基于 GoFrame v2 框架的后端服务，集 WebSocket 实时中继、REST API、设备管理、社交动态于一体。同时也是 App 端与机器人硬件之间的<strong>信令与媒体中转</strong>枢纽。</p>
+                    <div class="tech-tags">
+                        <span class="tech-tag green">Go 1.26</span>
+                        <span class="tech-tag green">GoFrame v2</span>
+                        <span class="tech-tag">gorilla/websocket</span>
+                        <span class="tech-tag">JWT</span>
+                        <span class="tech-tag">RSA OAEP</span>
+                        <span class="tech-tag">MySQL</span>
+                    </div>
+                    <div class="tree" style="margin-top:12px;">
+                        <span class="dir">server/</span><br>
+                        ├── <span class="file">main.go</span> <span class="cmt">// 程序入口</span><br>
+                        ├── <span class="dir">api/</span> <span class="cmt">// API 请求/响应结构定义</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">user/v2/</span> <span class="cmt">// 登录、注册、用户信息</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">device/v1+v2/</span> <span class="cmt">// 设备注册、绑定、解绑</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">dance/v1+v2/</span> <span class="cmt">// 舞蹈数据 CRUD</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">post/v1/</span> <span class="cmt">// 社交动态 + 评论</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">xiaozhi/v1/</span> <span class="cmt">// 小智 AI Token 管理</span><br>
+                        │&nbsp;&nbsp;└── <span class="dir">admin/v1/</span> <span class="cmt">// 管理员登录 &amp; 应用管理</span><br>
+                        ├── <span class="dir">internal/</span> <span class="cmt">// 核心业务逻辑</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">cmd/</span> <span class="cmt">// 路由注册（端口 12800，4 个 API 组）</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">controller/</span> <span class="cmt">// 控制器实现</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">service/</span> <span class="cmt">// 业务逻辑（用户、设备、舞蹈、应用）</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">middleware/</span> <span class="cmt">// JWT 验证 + CORS</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">web_socket/</span> <span class="cmt">// 🔥 核心：实时中继引擎 + 自定义二进制协议</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">model/</span> <span class="cmt">// 数据模型 + WebSocket 客户端模型</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">dao/</span> <span class="cmt">// 数据库访问层</span><br>
+                        │&nbsp;&nbsp;└── <span class="dir">xiaozhi/</span> <span class="cmt">// 小智 AI 平台 HTTP 客户端</span><br>
+                        ├── <span class="dir">manifest/</span> <span class="cmt">// Docker + Kubernetes 部署</span><br>
+                        ├── <span class="file">check_list/create_mysql_database.sql</span> <span class="cmt">// 8 张表 DDL</span><br>
+                        └── <span class="file">utility/rsa.go</span> <span class="cmt">// RSA OAEP 加解密工具</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Remote -->
+            <div class="module-card mod-rmt">
+                <div class="module-header">
+                    <h3>🎮 remote/ — 遥控器固件</h3>
+                    <div class="lang">C · ESP-IDF v5.4.2 · ESP32</div>
+                </div>
+                <div class="module-body">
+                    <p>运行于 M5Stack StickC-Plus + Hat Mini JoyC 摇杆配件上的独立遥控器，通过 <strong>ESP-NOW</strong> 低延迟协议直接控制机器人舵机运动。</p>
+                    <div class="tech-tags">
+                        <span class="tech-tag purple">ESP-IDF</span>
+                        <span class="tech-tag">ESP-NOW</span>
+                        <span class="tech-tag">LVGL 8.4</span>
+                        <span class="tech-tag">I2C</span>
+                        <span class="tech-tag">IMU</span>
+                    </div>
+                    <div class="tree" style="margin-top:12px;">
+                        <span class="dir">remote/code/</span><br>
+                        ├── <span class="file">CMakeLists.txt</span> <span class="cmt">// ESP-IDF 项目根</span><br>
+                        ├── <span class="file">partitions.csv</span> <span class="cmt">// NVS + PHY + factory (2MB Flash)</span><br>
+                        ├── <span class="dir">main/</span><br>
+                        │&nbsp;&nbsp;├── <span class="file">StackChan-RemoteControl-ESPNow.cpp</span> <span class="cmt">// 入口：初始化 + 3 个 FreeRTOS 任务</span><br>
+                        │&nbsp;&nbsp;├── <span class="file">lvgl_port.cpp/.h</span> <span class="cmt">// LVGL 显示移植</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">esp_now/</span> <span class="cmt">// ESP-NOW 初始化 &amp; 数据发送（8 字节数据包）</span><br>
+                        │&nbsp;&nbsp;├── <span class="dir">joystick/</span> <span class="cmt">// 摇杆 I2C 驱动 + 三种模式任务</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">handle_setup_screen</span> <span class="cmt">// 频道/ID 配置</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;├── <span class="file">handle_running_screen</span> <span class="cmt">// 摇杆→舵机映射</span><br>
+                        │&nbsp;&nbsp;│&nbsp;&nbsp;└── <span class="file">handle_imu_screen</span> <span class="cmt">// IMU 体感控制</span><br>
+                        │&nbsp;&nbsp;└── <span class="dir">ui/</span> <span class="cmt">// LVGL 三个屏幕（设置、运行、IMU 3D 立方体）</span><br>
+                        └── <span class="file">k151-R-StackChan-RemoteControl-ESPNow-v1.2-....bin</span> <span class="cmt">// 预编译固件</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========== COUPLING ========== -->
+    <div class="section">
+        <h2 class="section-title">模块耦合分析</h2>
+
+        <div class="card">
+            <p style="margin-bottom:20px;">四个模块通过三种通信协议构成松耦合的星形拓扑，<strong>服务器</strong>是核心枢纽，机器人固件不直接依赖 App 或遥控器。</p>
+
+            <div class="coupling-diagram">
+                <div class="coupling-row">
+                    <div class="coupling-box" style="background:linear-gradient(135deg,#4a8fe0,#7bb3f0);">📱 App</div>
+                    <div class="coupling-arrow">⟷</div>
+                    <div class="coupling-box" style="background:linear-gradient(135deg,#4caf7d,#81c784);">🖥️ Server</div>
+                    <div class="coupling-arrow">⟷</div>
+                    <div class="coupling-box" style="background:linear-gradient(135deg,#e85d3a,#f7a072);">📟 机器人固件</div>
+                </div>
+                <div class="coupling-row" style="gap:50px;">
+                    <span class="coupling-protocol">WebSocket 二进制协议<br>(Opus 音频 / JPEG 视频 / 控制命令)</span>
+                    <span class="coupling-protocol">WebSocket 二进制协议<br>(信令 + 音视频 + 命令中继)</span>
+                </div>
+                <div style="margin:16px 0;">⬆ &nbsp; 高耦合（实时双向通信）&nbsp; ⬆</div>
+
+                <div class="coupling-row">
+                    <div class="coupling-box" style="background:linear-gradient(135deg,#9b72cf,#c4a5f0);">🎮 遥控器</div>
+                    <div class="coupling-arrow">⟶</div>
+                    <div class="coupling-box" style="background:linear-gradient(135deg,#e85d3a,#f7a072);">📟 机器人固件</div>
+                    <div class="coupling-arrow" style="opacity:0.3;">- - ⟶</div>
+                    <div class="coupling-box" style="background:linear-gradient(135deg,#4caf7d,#81c784);">🖥️ Server</div>
+                </div>
+                <div class="coupling-row" style="gap:50px;">
+                    <span class="coupling-protocol">ESP-NOW 8 字节广播包<br>(直接点对点)</span>
+                    <span class="coupling-protocol" style="opacity:0.5;">无直接通信</span>
+                </div>
+                <div style="margin:16px 0;">⬇ &nbsp; 低耦合（单向控制 + 旁路架构）&nbsp; ⬇</div>
+
+                <div class="coupling-row">
+                    <div class="coupling-box" style="background:linear-gradient(135deg,#4a8fe0,#7bb3f0);">📱 App</div>
+                    <div class="coupling-arrow">⟷</div>
+                    <div class="coupling-box" style="background:linear-gradient(135deg,#e85d3a,#f7a072);">📟 机器人固件</div>
+                </div>
+                <div class="coupling-row">
+                    <span class="coupling-protocol">BLE GATT (蓝牙直连)<br>WiFi 局域网直连</span>
+                </div>
+                <div style="margin:12px 0 4px; font-size:0.82em; color:var(--text-light);">中耦合（AP 直连与云端中继双模式）</div>
+            </div>
+
+            <h4 style="margin-top:24px;">详细耦合说明</h4>
+            <div class="detail-grid">
+                <div class="detail-item" style="border-left-color:var(--accent-blue);">
+                    <h4>App ↔ 服务器（高耦合）</h4>
+                    <p>REST API（Dio HTTP）用于设备注册、绑定、舞蹈同步；WebSocket 自定义二进制协议用于实时音视频通话与控制信令中继。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--primary);">
+                    <h4>固件 ↔ 服务器（高耦合）</h4>
+                    <p>固件通过 WebSocket 连接服务器，上传摄像头画面 (JPEG) 和音频 (Opus)，接收 App 转发的控制命令和 AI 语音回复。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-purple);">
+                    <h4>遥控器 ↔ 固件（低耦合）</h4>
+                    <p>遥控器通过 ESP-NOW 广播 8 字节数据包直接控制固件的舵机，不经过服务器；固件独立解析。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-green);">
+                    <h4>App ↔ 固件（BLE / WiFi 直连）</h4>
+                    <p>App 可通过 BLE GATT 或局域网 WebSocket 直连机器人，用于设备配网、舞蹈录制等本地场景，无需服务器介入。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-amber);">
+                    <h4>固件 ↔ 小智 AI 平台（外部耦合）</h4>
+                    <p>固件的 AI Agent App 通过 WebSocket 连接 xiaozhi.me 平台，获取 LLM 对话能力；服务器也通过 REST API 管理小智平台的设备与智能体。</p>
+                </div>
+                <div class="detail-item">
+                    <h4>❌ 无直接耦合</h4>
+                    <p>遥控器 ↔ 服务器：遥控器完全独立，不与服务器交互。<br>App ↔ 遥控器：两者不直接通信。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== DATA FLOW ========== -->
+    <div class="section">
+        <h2 class="section-title">核心数据流</h2>
+
+        <div class="card">
+            <h4 style="margin-bottom:8px;">场景一：AI 对话</h4>
+            <div style="background:var(--bg); border-radius:8px; padding:16px; font-family:'SF Mono','Fira Code','Consolas',monospace; font-size:0.82em; line-height:2; margin-bottom:24px;">
+                App 麦克风 → <span style="color:var(--accent-blue);">Opus 编码</span> → WebSocket → <span style="color:var(--accent-green);">Server 中继</span> → WebSocket → 固件 → <span style="color:var(--primary);">小智 AI 平台</span> → TTS → WebSocket → <span style="color:var(--accent-green);">Server 中继</span> → App 扬声器
+            </div>
+
+            <h4 style="margin-bottom:8px;">场景二：遥控器控制</h4>
+            <div style="background:var(--bg); border-radius:8px; padding:16px; font-family:'SF Mono','Fira Code','Consolas',monospace; font-size:0.82em; line-height:2; margin-bottom:24px;">
+                摇杆/IMU → <span style="color:var(--accent-purple);">ESP-NOW 8B 包</span> → 固件 <span style="color:var(--accent-amber);">ESP-NOW App</span> → StackChan::updateMotion() → 伺服电机
+            </div>
+
+            <h4 style="margin-bottom:8px;">场景三：摄像头监控</h4>
+            <div style="background:var(--bg); border-radius:8px; padding:16px; font-family:'SF Mono','Fira Code','Consolas',monospace; font-size:0.82em; line-height:2;">
+                固件摄像头 → <span style="color:var(--primary);">JPEG 编码</span> → WebSocket → <span style="color:var(--accent-green);">Server 中继</span> → WebSocket → App → 解码显示
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== IMPLEMENTATION HIGHLIGHTS ========== -->
+    <div class="section">
+        <h2 class="section-title">实现要点说明</h2>
+
+        <div class="card">
+            <div class="card-title">📟 固件核心机制</div>
+            <div class="detail-grid">
+                <div class="detail-item" style="border-left-color:var(--primary);">
+                    <h4>mooncake 应用框架</h4>
+                    <p>每个功能（AI、Avatar、舞蹈等）是一个独立的 AppAbility，通过 installApp 注册，由 mooncake 事件循环统一调度。App 间通过 HAL 共享硬件资源。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--primary);">
+                    <h4>StackChan 引擎</h4>
+                    <p>核心类组合了 Motion（舵机）、Avatar（面部渲染）、NeonLight（RGB）和 Modifier 池。Modifier 实现"叠加式"动画行为（如说话时嘴动 + 眨眼 + 呼吸可同时生效）。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--primary);">
+                    <h4>关键帧动画</h4>
+                    <p>KeyframeSequence 定义面部特征（眼睛/嘴位置、缩放）和舵机角度的关键帧，Timeline 负责播放控制（循环、暂停）。支持从 JSON 远程加载。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--primary);">
+                    <h4>HAL 硬件抽象层</h4>
+                    <p>所有硬件访问（BLE、WiFi、IMU、舵机、触摸、RTC）通过 Hal 接口统一封装。支持 80+ 种开发板，通过 Kconfig menuconfig 选择。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--primary);">
+                    <h4>无线通信栈</h4>
+                    <p>三模通信：BLE (NimBLE) 用于配网和本地控制、WebSocket 用于云端中继、ESP-NOW 用于低延迟遥控器。三种协议互不干扰。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--primary);">
+                    <h4>Avatar 面部系统</h4>
+                    <p>基于 LVGL 绘制。采用"皮肤 (Skin)"模式：默认皮肤包含眼睛、嘴、气泡等元素。Decorator 可叠加瞬态装饰（爱心、冷汗、眩晕等），支持表情切换。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">📱 App 核心机制</div>
+            <div class="detail-grid">
+                <div class="detail-item" style="border-left-color:var(--accent-blue);">
+                    <h4>GetX 状态管理</h4>
+                    <p>AppState 单例管理全局状态（设备列表、登录态、连接模式）。响应式编程通过 Rx 变量和 Obx widget 实现。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-blue);">
+                    <h4>BLE 引擎</h4>
+                    <p>flutter_blue_plus 封装，支持三种连接模式：WiFi 直连（Mode 1）、舞蹈录制（Mode 2）、设备配对（Mode 3）。数据通过特征 (Characteristics) 读写。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-blue);">
+                    <h4>WebSocket 二进制协议</h4>
+                    <p>自定义协议：1 字节类型 + 4 字节长度 (BE) + 负载。支持 Opus 音频流、JPEG 视频帧、控制命令的实时双向传输。自动重连 + Ping/Pong 保活。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-blue);">
+                    <h4>双网架构</h4>
+                    <p>同时连接自建服务器（设备管理/舞蹈/社交）和小智 AI 平台（智能体/LLM/TTS）。两个网络通过 XiaoZhi_util 独立管理 token。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-blue);">
+                    <h4>音频处理管线</h4>
+                    <p>AudioEngineManager 管理 Opus 编解码（16kHz, 单声道, 320 帧）。录音通过原生桥接 (MethodChannel) 启动，JNI/Swift 侧采集 PCM 数据，Dart 侧编码为 Opus 发送。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-blue);">
+                    <h4>人脸追踪与 AR</h4>
+                    <p>Google ML Kit 检测人脸关键点，映射到 3D 机器人模型（three_js 或原生 SceneKit），实现"Avatar 镜像"效果——机器人面部跟随用户表情。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🖥️ 服务器核心机制</div>
+            <div class="detail-grid">
+                <div class="detail-item" style="border-left-color:var(--accent-green);">
+                    <h4>WebSocket 中继引擎</h4>
+                    <p>核心是 gorilla/websocket 实现的"房间"模式。维护两个连接池：stackChanClientPool（按 MAC 索引）和 appClientPool。消息通过类型路由（0x01~0x1A）。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-green);">
+                    <h4>双层认证模型</h4>
+                    <p>V1 API 使用 RSA-OAEP 加密的 MAC 地址（从 Authorization 头解码）。V2 API 使用 HMAC-SHA256 JWT（有效期 1 年）。WebSocket 通过 Base64(RSA(MAC)) 认证。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-green);">
+                    <h4>双 API 版本</h4>
+                    <p>V1 基于 MAC 地址的传统认证，包含完整功能。V2 基于 JWT 的现代认证，提供精简的 REST API。两者共存于同一服务。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-green);">
+                    <h4>外部系统集成</h4>
+                    <p>用户认证委托给远程 NodeBB 论坛；设备与智能体管理通过 REST API 操作小智 AI 平台（xiaozhi.me），Token 自动 24h 刷新。</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">🎮 遥控器核心机制</div>
+            <div class="detail-grid">
+                <div class="detail-item" style="border-left-color:var(--accent-purple);">
+                    <h4>三模式切换</h4>
+                    <p>SETUP（配置频道/ID）→ RUNNING（摇杆控制）→ IMU（体感控制）。BtnA 循环切换，BtnB 切换选择项/按钮状态。模式间通过共享数据结构 (joystick_data_t) 交互。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-purple);">
+                    <h4>ESP-NOW 数据包</h4>
+                    <p>8 字节固定格式：目标 ID + Yaw(int16) + Pitch(int16) + Speed(int16) + BtnB(bool)。无连接、无确认的广播协议，延迟极低（ms 级）。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-purple);">
+                    <h4>死区与滤波</h4>
+                    <p>摇杆中心区 ±300 的死区防止抖动。变化量小于阈值（5 或 10）时不上报，避免网络拥塞。摇杆原始值映射到舵机物理角度范围。</p>
+                </div>
+                <div class="detail-item" style="border-left-color:var(--accent-purple);">
+                    <h4>3D 姿态显示</h4>
+                    <p>IMU 模式下，LCD 显示一个旋转的 3D 线框立方体。通过旋转矩阵计算顶点投影，实时反映设备俯仰/滚转姿态，提供直观的体感控制反馈。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== TECH STACK ========== -->
+    <div class="section">
+        <h2 class="section-title">技术栈全景</h2>
+        <div class="card">
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:20px;">
+                <div>
+                    <h4 style="color:var(--primary); margin-bottom:8px;">📟 固件</h4>
+                    <ul class="feature-list">
+                        <li>ESP-IDF v5.5.4</li>
+                        <li>ESP32-S3 (Xtensa LX7)</li>
+                        <li>C++20, LVGL 9.4</li>
+                        <li>mooncake 应用框架</li>
+                        <li>xiaozhi-esp32 语音框架</li>
+                        <li>NimBLE (BLE)</li>
+                        <li>ESP-NOW</li>
+                        <li>ArduinoJson</li>
+                        <li>SPIFFS (素材分区)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color:var(--accent-blue); margin-bottom:8px;">📱 App</h4>
+                    <ul class="feature-list">
+                        <li>Flutter 3.11 (Dart)</li>
+                        <li>iOS / Android</li>
+                        <li>GetX 状态管理</li>
+                        <li>flutter_blue_plus (BLE)</li>
+                        <li>Dio (HTTP)</li>
+                        <li>gorilla/websocket</li>
+                        <li>Opus 编解码</li>
+                        <li>Google ML Kit</li>
+                        <li>SceneKit / three_js (3D)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color:var(--accent-green); margin-bottom:8px;">🖥️ 服务器</h4>
+                    <ul class="feature-list">
+                        <li>Go 1.26</li>
+                        <li>GoFrame v2</li>
+                        <li>gorilla/websocket</li>
+                        <li>golang-jwt v5</li>
+                        <li>RSA OAEP/SHA-256</li>
+                        <li>MySQL 8 表</li>
+                        <li>Docker (Alpine)</li>
+                        <li>Kubernetes (Kustomize)</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 style="color:var(--accent-purple); margin-bottom:8px;">🎮 遥控器</h4>
+                    <ul class="feature-list">
+                        <li>ESP-IDF v5.4.2</li>
+                        <li>ESP32 (Xtensa LX6)</li>
+                        <li>M5StickC-Plus</li>
+                        <li>Hat Mini JoyC (I2C)</li>
+                        <li>ESP-NOW v2.5.3</li>
+                        <li>LVGL 8.4</li>
+                        <li>M5Unified</li>
+                        <li>IMU (SH200Q)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== PROJECT STATS ========== -->
+    <div class="section">
+        <h2 class="section-title">项目统计</h2>
+        <div class="card">
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number">~1.2k</div>
+                    <div class="stat-label">固件源文件行数 (C/C++)</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">~150</div>
+                    <div class="stat-label">App Dart 源文件</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">~90</div>
+                    <div class="stat-label">服务器 Go 源文件</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">4</div>
+                    <div class="stat-label">独立可运行模块</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">3</div>
+                    <div class="stat-label">无线协议 (BLE/WS/ESP-NOW)</div>
+                </div>
+            </div>
+            <div class="tree" style="margin-top:16px;">
+                <span class="dir">StackChan/</span><br>
+                ├── <span class="dir">app/</span> <span class="cmt">     189 个文件 · Flutter (iOS + Android)</span><br>
+                ├── <span class="dir">firmware/</span> <span class="cmt">  229 个文件 · ESP-IDF (ESP32-S3)</span><br>
+                ├── <span class="dir">remote/</span> <span class="cmt">    29 个文件 · ESP-IDF (ESP32)</span><br>
+                ├── <span class="dir">server/</span> <span class="cmt">     177 个文件 · Go (GoFrame)</span><br>
+                ├── <span class="dir">build/</span> <span class="cmt">      构建输出</span><br>
+                └── <span class="file">README.md</span> <span class="cmt">     项目简介</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>StackChan Open-Source · 由 WorkBuddy 分析并生成 · 2026-07-07</p>
+</div>
+
+</body>
+</html>
