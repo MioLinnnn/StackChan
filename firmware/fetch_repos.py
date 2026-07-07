@@ -15,6 +15,8 @@ def clone_or_update_repo(
 
     if ref:
         subprocess.run(["git", "-C", path, "checkout", ref], check=True)
+        if patch_path:
+            subprocess.run(["git", "-C", path, "reset", "--hard", ref], check=True)
 
     if with_submodules:
         subprocess.run(

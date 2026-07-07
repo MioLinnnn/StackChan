@@ -67,7 +67,7 @@ index d69d43d..3b6f07e 100644
  
  void Application::Alert(const char* status, const char* message, const char* emotion, const std::string_view& sound) {
 diff --git a/main/assets.cc b/main/assets.cc
-index ad61944..6b84daf 100644
+index ad61944..91e9f12 100644
 --- a/main/assets.cc
 +++ b/main/assets.cc
 @@ -3,8 +3,8 @@
@@ -153,11 +153,11 @@ index ad61944..6b84daf 100644
 -}
 +// bool Assets::EmoteStrategy::InitializePartition(Assets* assets) {
 +//     assets->partition_valid_ = false;
-+
++//
 +//     if (!Assets::FindPartition(assets)) {
 +//         return false;
 +//     }
-+
++//
 +//     esp_err_t ret = ESP_ERR_INVALID_STATE;
 +//     auto display = Board::GetInstance().GetDisplay();
 +//     auto* emote_display = dynamic_cast<emote::EmoteDisplay*>(display);
@@ -178,7 +178,7 @@ index ad61944..6b84daf 100644
 +//     assets->partition_valid_ = ((ret == ESP_OK) ? true : false);
 +//     return assets->partition_valid_;
 +// }
-+
++//
 +// void Assets::EmoteStrategy::UnApplyPartition(Assets* assets) {
 +//     auto display = Board::GetInstance().GetDisplay();
 +//     auto* emote_display = dynamic_cast<emote::EmoteDisplay*>(display);
@@ -187,7 +187,7 @@ index ad61944..6b84daf 100644
 +//     }
 +//     (void)assets; // Unused parameter
 +// }
-+
++//
 +// bool Assets::EmoteStrategy::GetAssetData(Assets* assets, const std::string& name, void*& ptr, size_t& size) {
 +//     auto display = Board::GetInstance().GetDisplay();
 +//     auto* emote_display = dynamic_cast<emote::EmoteDisplay*>(display);
@@ -205,13 +205,13 @@ index ad61944..6b84daf 100644
 +//     (void)assets; // Unused parameter
 +//     return false;
 +// }
-+
++//
 +// bool Assets::EmoteStrategy::Apply(Assets* assets) {
 +//     Assets::LoadSrmodelsFromIndex(assets);
-+
++//
 +//     auto display = Board::GetInstance().GetDisplay();
 +//     auto* emote_display = dynamic_cast<emote::EmoteDisplay*>(display);
-+
++//
 +//     if (emote_display && emote_display->GetEmoteHandle() != nullptr) {
 +//         emote_load_assets(emote_display->GetEmoteHandle());
 +//     }

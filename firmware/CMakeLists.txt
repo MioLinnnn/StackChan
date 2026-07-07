@@ -2,6 +2,10 @@
 # CMakeLists in this exact order for cmake to work correctly
 cmake_minimum_required(VERSION 3.16)
 
+# Windows cmd.exe limits command length to ~8191 chars; this project exceeds
+# that for some translation units, which breaks header search (e.g. reent.h).
+set(CMAKE_NINJA_FORCE_RESPONSE_FILE ON CACHE BOOL "" FORCE)
+
 set(PROJECT_VER "1.4.3")
 add_definitions(-DFIRMWARE_VERSION=\"${PROJECT_VER}\")
 
