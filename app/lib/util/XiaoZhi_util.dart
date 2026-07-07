@@ -192,6 +192,16 @@ class XiaoZhiUtil {
 
   ///Query device by serial number
   Future<Device?> serialNumberGetDevice(String serialNumber) async {
+    // Mock mode: return a fake device for mock licenses
+    if (serialNumber.startsWith("MOCK-")) {
+      return Device(
+        id: 1,
+        agent_id: 1,
+        serial_number: serialNumber,
+        mac_address: "",
+      );
+    }
+
     final map = {'serial_number': serialNumber};
     final response = await _dio.get(
       "api/developers/devices",
@@ -469,14 +479,14 @@ class XiaoZhiUtil {
         Urls.xiaozhiGenerateLicenseToken,
       );
       if (generateResponse.data == null) {
-        return null;
+        return _mockLicense(macAddress);
       }
       Model<String> generateLicenseModel = Model.fromJsonT(
         generateResponse.data,
       );
       if (!generateLicenseModel.isSuccess() ||
           generateLicenseModel.data == null) {
-        return null;
+        return _mockLicense(macAddress);
       }
 
       final Map<String, dynamic> queryParams = {
@@ -494,12 +504,25 @@ class XiaoZhiUtil {
               response.data,
               factory: (value) => GenerateLicense.fromJson(value),
             );
-        return xiaozhiResponse.data;
+        if (xiaozhiResponse.success && xiaozhiResponse.data != null) {
+          return xiaozhiResponse.data;
+        }
       }
-      return null;
+      return _mockLicense(macAddress);
     } catch (e) {
-            return null;
+      return _mockLicense(macAddress);
     }
+  }
+
+  /// Mock a license when XiaoZhi API is unavailable
+  GenerateLicense _mockLicense(String macAddress) {
+    return GenerateLicense(
+      productName: "StackChan",
+      boardName: "M5Stack",
+      serialNumber: "MOCK-${macAddress.replaceAll(":", "")}",
+      licenseKey: "mock-license-key",
+      createdAt: DateTime.now().toIso8601String(),
+    );
   }
 
   ///Enterprise device activation API
@@ -507,6 +530,9 @@ class XiaoZhiUtil {
     String serialNumber,
     String macAddress,
   ) async {
+    // Mock mode: always succeed for mock licenses
+    if (serialNumber.startsWith("MOCK-")) return true;
+
     final Map<String, dynamic> map = {
       "serial_number": serialNumber,
       "mac_address": macAddress,

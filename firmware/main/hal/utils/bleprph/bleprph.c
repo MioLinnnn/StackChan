@@ -438,6 +438,7 @@ static int bleprph_gap_event(struct ble_gap_event *event, void *arg)
         case BLE_GAP_EVENT_MTU:
             MODLOG_DFLT(INFO, "mtu update event; conn_handle=%d cid=%d mtu=%d\n", event->mtu.conn_handle,
                         event->mtu.channel_id, event->mtu.value);
+            stackchan_ble_set_mtu_payload(event->mtu.value);
             return 0;
 
         case BLE_GAP_EVENT_REPEAT_PAIRING:

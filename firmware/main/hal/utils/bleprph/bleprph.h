@@ -163,6 +163,13 @@ void stackchan_ble_set_conn_handle(uint16_t conn_handle);
  */
 bool stackchan_ble_is_connected(void);
 
+/**
+ * Update usable ATT notification payload after MTU negotiation.
+ *
+ * @param mtu  Negotiated ATT MTU. Usable notification payload is mtu - 3.
+ */
+void stackchan_ble_set_mtu_payload(uint16_t mtu);
+
 void gatt_svr_register_cb(struct ble_gatt_register_ctxt *ctxt, void *arg);
 int gatt_svr_init(bool use_alt_uuid);
 

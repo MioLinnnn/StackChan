@@ -23,6 +23,18 @@ static const uint16_t _ble_fragment_header_len  = 10;
 static const uint16_t _ble_fallback_payload_len = 20;
 static uint16_t _ble_dynamic_payload            = _ble_fallback_payload_len;
 
+
+void stackchan_ble_set_mtu_payload(uint16_t mtu)
+{
+    if (mtu <= 3) {
+        _ble_dynamic_payload = _ble_fallback_payload_len;
+        return;
+    }
+
+    _ble_dynamic_payload = std::min<uint16_t>(mtu - 3, STACKCHAN_MAX_JSON_LEN);
+    mclog::tagInfo(_tag, "BLE notify payload updated from MTU: mtu={}, payload={}", mtu, _ble_dynamic_payload);
+}
+
 using BleNotifyCallback = int (*)(const char*, uint16_t);
 
 static void _recordIncomingWritePayload(uint16_t len)
