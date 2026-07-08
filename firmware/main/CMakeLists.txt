@@ -15,6 +15,10 @@ file(GLOB_RECURSE STACK_CHAN_SOURCES
     "stackchan/*.cc"
     "stackchan/*.cpp"
 )
+list(APPEND STACK_CHAN_SOURCES
+    "hal/utils/debug_shell/shell.cc"
+    "hal/utils/debug_shell/t_app.cc"
+)
 set(STACK_CHAN_INCLUDE_DIRS 
     "."
 )

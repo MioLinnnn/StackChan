@@ -9,6 +9,7 @@
 #include <mooncake.h>
 #include <apps/apps.h>
 #include <hal/hal.h>
+#include <hal/utils/debug_shell/shell.h>
 
 using namespace mooncake;
 using namespace smooth_ui_toolkit;
@@ -21,6 +22,9 @@ extern "C" void app_main(void)
 
     // HAL init
     GetHAL().init();
+
+    // Start debug shell (REPL on UART, registers "t" + "key" commands)
+    shell_init();
 
     // Setup ui hal
     ui_hal::on_delay([](uint32_t ms) { GetHAL().delay(ms); });
