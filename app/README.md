@@ -275,6 +275,54 @@ The application integrates with two main backend services:
 
 ## Development
 
+### Daily Debugging with Hot Reload (Recommended)
+
+For day-to-day development, use `flutter run` on a USB-connected Android device instead of
+rebuilding a release APK after every change.
+
+**Prerequisites (one-time):**
+
+1. Enable Developer Options and USB debugging on your Android phone
+2. Connect via USB and authorize the computer when prompted
+3. Verify the device is visible:
+
+```powershell
+adb devices
+```
+
+**Start the debug session:**
+
+```powershell
+# From the app/ directory (handles native deps + PATH automatically)
+.\scripts\run-dev.ps1
+
+# Or specify a device id when multiple devices are connected
+.\scripts\run-dev.ps1 -DeviceId <device_id>
+```
+
+The first run compiles debug native libraries and may take several minutes. Keep the terminal
+open afterward.
+
+**While the session is running:**
+
+| Key | Action |
+|-----|--------|
+| `r` | Hot Reload — apply Dart/UI changes in 1–3 seconds |
+| `R` | Hot Restart — re-run `main()` and reset app state |
+| `q` | Quit the debug session |
+
+**Daily workflow:** keep the `run-dev.ps1` terminal open, edit files under `lib/`, save,
+then press `r` in that terminal. If changes do not appear, try `R`. If you changed native
+code, `pubspec.yaml`, or assets, stop with `q` and run `.\scripts\run-dev.ps1` again.
+
+**When to use each:**
+
+- **Hot Reload (`r`)**: UI, layout, business logic in `lib/view/`, `lib/network/`, `lib/model/`
+- **Hot Restart (`R`)**: changes to `lib/main.dart`, `lib/app_state.dart`, or `const` values in
+  `lib/util/value_constant.dart` / `lib/network/urls.dart`
+- **Re-run `run-dev.ps1`**: native code (`android/`), `pubspec.yaml`, new assets, or plugin upgrades
+- **`build-apk.ps1`**: release builds for distribution or final validation
+
 ### Code Style
 
 This project follows the official Dart and Flutter style guidelines:
@@ -347,6 +395,19 @@ cd ..
 flutter clean
 flutter pub get
 ```
+
+**5. First `flutter run` fails with Gradle network/TLS errors**
+
+- Ensure your local proxy (configured in `android/gradle.properties` as `127.0.0.1:7897`) is running
+- Or temporarily disable/remove proxy settings in `gradle.properties` if you have direct network access
+- Retry: `.\scripts\run-dev.ps1`
+- The first debug build downloads Maven artifacts and compiles native libraries; it can take several minutes
+
+**6. `run-dev.ps1` reports no Android device**
+
+- Enable USB debugging on the phone and authorize the computer
+- Run `adb devices` and confirm the device shows `device` (not `unauthorized`)
+- Try a data-capable USB cable and a different USB port
 
 ## License
 
