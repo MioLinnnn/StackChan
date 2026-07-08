@@ -323,6 +323,18 @@ code, `pubspec.yaml`, or assets, stop with `q` and run `.\scripts\run-dev.ps1` a
 - **Re-run `run-dev.ps1`**: native code (`android/`), `pubspec.yaml`, new assets, or plugin upgrades
 - **`build-apk.ps1`**: release builds for distribution or final validation
 
+### Debug Panel (debug builds only)
+
+When running a debug build (`kDebugMode && !App.isRelease`), open **Settings → Developer → Debug Panel**.
+
+The panel shows:
+
+- **Server URLs** (read-only): HTTP API, WebSocket, file URL, and XiaoZhi API
+- **Connection status**: login, device binding, WebSocket, device online, HTTP reachability
+- **Logs**: HTTP and WebSocket events captured in an in-memory ring buffer (clear / copy / filter)
+
+Use **Reconnect WebSocket** to manually trigger `AppState.connectWebSocket()` while debugging connectivity issues.
+
 ### Code Style
 
 This project follows the official Dart and Flutter style guidelines:

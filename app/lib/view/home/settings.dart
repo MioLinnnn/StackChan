@@ -4,14 +4,17 @@ SPDX-License-Identifier: MIT
 */
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 import 'package:pull_down_button/pull_down_button.dart';
 import 'package:stack_chan/app_state.dart';
+import 'package:stack_chan/view/app.dart';
 import 'package:stack_chan/view/home/conversation_page.dart';
 import 'package:stack_chan/view/home/mcp_page.dart';
+import 'package:stack_chan/view/popup/debug_panel_page.dart';
 import 'package:stack_chan/view/popup/user_info_page.dart';
 
 import '../popup/xiaozhi_welcome_page.dart';
@@ -290,6 +293,24 @@ class _SettingsState extends State<Settings> {
               CupertinoListSection.insetGrouped(
                 children: [_unbindResetTitle(), _buildBindDeviceTile()],
               ),
+
+              if (kDebugMode && !App.isRelease)
+                CupertinoListSection.insetGrouped(
+                  header: const Text('Developer'),
+                  children: [
+                    CupertinoListTile(
+                      title: const Text('Debug Panel'),
+                      trailing: const CupertinoListTileChevron(),
+                      onTap: () {
+                        showCupertinoSheet(
+                          context: context,
+                          showDragHandle: true,
+                          builder: (context) => const DebugPanelPage(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
             ],
           ),
         ],

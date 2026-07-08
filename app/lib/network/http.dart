@@ -4,29 +4,26 @@ SPDX-License-Identifier: MIT
 */
 
 import 'package:dio/dio.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:stack_chan/app_state.dart';
 import 'package:stack_chan/network/urls.dart';
 import 'package:stack_chan/network/web_socket_util.dart';
 
+import '../util/debug_log_service.dart';
 import '../util/rsa_util.dart';
 import '../util/value_constant.dart';
 
 void logPrint(Object? object) {
   if (object == null) return;
-  String log = object.toString();
-  const int chunkSize = 800; //800（limit）
-  //ifcontent,directPrint
+  final log = object.toString();
+  const chunkSize = 800;
   if (log.length <= chunkSize) {
-        return;
+    DebugLogService.shared.info('HTTP', log);
+    return;
   }
-
-  //contentPrint
   for (int i = 0; i < log.length; i += chunkSize) {
-    int end = i + chunkSize;
-    if (end > log.length) end = log.length;
-    //usedebugPrint(print,supportcontent)
-      }
+    final end = i + chunkSize > log.length ? log.length : i + chunkSize;
+    DebugLogService.shared.info('HTTP', log.substring(i, end));
+  }
 }
 
 class Http {
@@ -71,7 +68,13 @@ class Http {
         return handler.next(response);
       },
       onError: (DioException error, ErrorInterceptorHandler handler) async {
-        if (error.response?.statusCode == 401) {
+        final status = error.response?.statusCode;
+        DebugLogService.shared.error(
+          'HTTP',
+          '${error.requestOptions.method} ${error.requestOptions.path} '
+          '-> ${status ?? error.type}',
+        );
+        if (status == 401) {
           await AppState.shared.logout();
         }
         return handler.next(error);

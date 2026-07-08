@@ -8,11 +8,11 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 
-//Assume theseisYoucustomDepends on(according toActual situationAdjust)
 import '../app_state.dart';
 import '../model/msg_type.dart';
+import '../util/debug_log_service.dart';
 import '../util/rsa_util.dart';
 import '../util/value_constant.dart';
 
@@ -24,8 +24,9 @@ class WebSocketUtil {
   WebSocket? _socket;
   StreamSubscription? _subscription;
 
-  //newIncrease / Add:Recordcurrentconnectstate,avoidRepeatPrint
   bool _isConnected = false;
+
+  final RxBool connectionStatus = false.obs;
 
   Function()? connectionSuccessful;
 
@@ -33,9 +34,6 @@ class WebSocketUtil {
 
   String _urlString = '';
 
-  /* =======================
-   * Authorization
-   * ======================= */
   String getAuthorization(String mac) {
     final rand = Random();
     final randomPart = List.generate(
@@ -50,11 +48,7 @@ class WebSocketUtil {
     return '$mac|$randomPart|$timestamp';
   }
 
-  /* =======================
-   * Connect
-   * ======================= */
   Future<void> connect(String urlString) async {
-    //ifalreadyexistconnect,First / PreviouslyDisconnect
     if (_socket != null) {
       disconnect();
     }
@@ -62,11 +56,13 @@ class WebSocketUtil {
     _urlString = urlString;
 
     if (AppState.shared.deviceMac.isEmpty) {
-            return;
+      DebugLogService.shared.warn('WS', 'Skipped: no deviceMac');
+      _setConnectionState(false);
+      return;
     }
 
-    //Printconnectstartlog
-    
+    DebugLogService.shared.info('WS', 'Connecting $urlString');
+
     try {
       final encryptedToken = RsaUtil.encrypt(
         getAuthorization(AppState.shared.deviceMac),
@@ -74,10 +70,10 @@ class WebSocketUtil {
       final headers = {ValueConstant.authorization: encryptedToken};
       _socket = await WebSocket.connect(urlString, headers: headers);
 
-      //connectsuccesslog(ContainstimeandURL)
-      _isConnected = true;
+      _setConnectionState(true);
       final connectTime = DateTime.now().toString().split('.').first;
-                  
+      DebugLogService.shared.info('WS', 'Connected at $connectTime');
+
       _subscription = _socket!.listen(
         _handleMessage,
         onError: _handleError,
@@ -85,20 +81,15 @@ class WebSocketUtil {
         cancelOnError: true,
       );
 
-      if (connectionSuccessful != null) {
-        connectionSuccessful!();
-      }
+      connectionSuccessful?.call();
     } catch (e) {
-      _isConnected = false;
-      //connectfaillog(ContainsSpecificerrorinfo)
+      _setConnectionState(false);
       final errorTime = DateTime.now().toString().split('.').first;
-                        _scheduleReconnect();
+      DebugLogService.shared.error('WS', 'Connect failed at $errorTime: $e');
+      _scheduleReconnect();
     }
   }
 
-  /* =======================
-   * Message Handling
-   * ======================= */
   void _handleMessage(dynamic message) {
     final isPing = replyPong(message);
     if (!isPing) {
@@ -107,16 +98,16 @@ class WebSocketUtil {
   }
 
   void _handleError(Object error) {
-    //errorlog(DistinguishconnecterrorandRunning / Runtimewhenerror)
-        _isConnected = false;
+    DebugLogService.shared.error('WS', 'Error: $error');
+    _setConnectionState(false);
     _scheduleReconnect();
   }
 
   void _handleDone() {
-    //connectcloselog(ContainscloseoriginalBecause)
-    _isConnected = false;
+    _setConnectionState(false);
     final closeTime = DateTime.now().toString().split('.').first;
-                _scheduleReconnect();
+    DebugLogService.shared.warn('WS', 'Closed at $closeTime, scheduling reconnect');
+    _scheduleReconnect();
   }
 
   bool replyPong(dynamic message) {
@@ -137,63 +128,53 @@ class WebSocketUtil {
     return false;
   }
 
-  /* =======================
-   * Send
-   * ======================= */
   void sendString(String message) {
     if (_socket == null) {
-            return;
+      return;
     }
 
-        try {
+    try {
       _socket!.add(message);
     } catch (e) {
-            _isConnected = false;
+      DebugLogService.shared.error('WS', 'Send string failed: $e');
+      _setConnectionState(false);
       _scheduleReconnect();
     }
   }
 
   void send(Uint8List data) {
     if (_socket == null) {
-            return;
+      return;
     }
 
-    //debugPrint('📤 send2Basemessage: length=${data.length} Byte');
     try {
       _socket!.add(data);
     } catch (e) {
-            _isConnected = false;
+      DebugLogService.shared.error('WS', 'Send failed: $e');
+      _setConnectionState(false);
       _scheduleReconnect();
     }
   }
 
-  /* =======================
-   * Reconnect
-   * ======================= */
   void _scheduleReconnect() async {
     if (_urlString.isEmpty) return;
 
-    //reconnectlog(avoidFrequentlyRepeatPrint)
     if (!_isConnected) {
-          }
+      DebugLogService.shared.info('WS', 'Reconnecting...');
+    }
 
     await Future.delayed(const Duration(seconds: 1));
     await connect(_urlString);
   }
 
-  /* =======================
-   * Disconnect
-   * ======================= */
   void disconnect() {
     _subscription?.cancel();
     _socket?.close(WebSocketStatus.goingAway, '主动断开连接');
-    _isConnected = false;
+    _setConnectionState(false);
     _socket = null;
-      }
+    DebugLogService.shared.info('WS', 'Disconnected');
+  }
 
-  /* =======================
-   * Observer
-   * ======================= */
   void addObserver(String key, void Function(dynamic message) observer) {
     _observers[key] = observer;
   }
@@ -212,6 +193,10 @@ class WebSocketUtil {
     }
   }
 
-  //newIncrease / Add:Getcurrentconnectstatemethod(ConvenientExternalquery)
   bool get isConnected => _isConnected && _socket?.readyState == WebSocket.open;
+
+  void _setConnectionState(bool connected) {
+    _isConnected = connected;
+    connectionStatus.value = connected && _socket?.readyState == WebSocket.open;
+  }
 }
